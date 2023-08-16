@@ -44,7 +44,7 @@ server.post(
     await sendEmail({ toEmail, subject, message, attachments: newarr });
     res.status(200).json({
       success: true,
-      message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please cheack spam list`,
+      message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please check spam list`,
     });
   })
 );
