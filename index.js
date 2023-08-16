@@ -2,11 +2,14 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const nodeMailer = require("nodemailer");
 const cors = require("cors");
+const multer = require("multer");
 const asyncHandler = require("express-async-handler");
+var bodyParser = require("body-parser");
 
 const server = express();
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: true }));
+server.use(multer().array());
 server.use(cors());
 
 const sendEmail = async (options) => {
@@ -24,9 +27,9 @@ const sendEmail = async (options) => {
   const mailOptions = {
     from: process.env.SMPT_MAIL,
     to: options.toEmail,
-    subject: options.subject,
-    text: options.message,
-    attachments: options.attachments,
+    subject: options.subject || `email from ${options.toEmail}`,
+    text: options.message || `email from ${options.toEmail}`,
+    attachments: options.attachments || [],
   };
 
   await transporter.sendMail(mailOptions);
@@ -37,10 +40,12 @@ server.post(
   asyncHandler(async (req, res, next) => {
     const { toEmail, subject, message, attachments } = req.body;
     const newarr = [];
-    for (let i = 0; i < attachments.length; i++) {
-      let temparr = {};
-      temparr["path"] = attachments[i];
-      newarr[i] = temparr;
+    if (attachments !== undefined) {
+      for (let i = 0; i < attachments.length; i++) {
+        let temparr = {};
+        temparr["path"] = attachments[i];
+        newarr[i] = temparr;
+      }
     }
     await sendEmail({ toEmail, subject, message, attachments: newarr });
     res.status(200).json({
