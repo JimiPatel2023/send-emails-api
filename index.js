@@ -6,6 +6,7 @@ const asyncHandler = require("express-async-handler");
 
 const server = express();
 server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
 server.use(cors());
 
 const sendEmail = async (options) => {
