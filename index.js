@@ -25,6 +25,7 @@ const sendEmail = async (options) => {
     to: options.toEmail,
     subject: options.subject,
     text: options.message,
+    attachments: options.attachments,
   };
 
   await transporter.sendMail(mailOptions);
@@ -33,8 +34,14 @@ const sendEmail = async (options) => {
 server.post(
   "/send",
   asyncHandler(async (req, res, next) => {
-    const { toEmail, message } = req.body;
-    await sendEmail({ toEmail, message });
+    const { toEmail, subject, message, attachments } = req.body;
+    const newarr = [];
+    for (let i = 0; i < attachments.length; i++) {
+      let temparr = {};
+      temparr["path"] = attachments[i];
+      newarr[i] = temparr;
+    }
+    await sendEmail({ toEmail, subject, message, attachments: newarr });
     res.status(200).json({
       success: true,
       message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please cheack spam list`,
