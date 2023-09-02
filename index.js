@@ -37,7 +37,7 @@ const sendEmail = async (options) => {
     await transporter.sendMail(mailOptions);
     options.res.status(200).json({
       success: true,
-      message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please check spam list`,
+      message: `email successfully sent to ${options.toEmail}. if email does not appear in inbox, please check spam list`,
     });
   } catch (error) {
     options.res.status(200).json({
