@@ -40,7 +40,7 @@ const sendEmail = async (options) => {
       message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please check spam list`,
     });
   } catch (error) {
-    options.res.status(400).json({
+    options.res.status(200).json({
       success: false,
       message: `Error : ${error.message}`,
     });
