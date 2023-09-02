@@ -28,17 +28,29 @@ const sendEmail = async (options) => {
     from: process.env.SMPT_MAIL,
     to: options.toEmail,
     subject: options.subject || `email from ${options.toEmail}`,
+    html: options.html || ``,
     text: options.message || `email from ${options.toEmail}`,
     attachments: options.attachments || [],
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    options.res.status(200).json({
+      success: true,
+      message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please check spam list`,
+    });
+  } catch (error) {
+    options.res.status(400).json({
+      success: false,
+      message: `Error : ${error.message}`,
+    });
+  }
 };
 
 server.post(
   "/send",
   asyncHandler(async (req, res, next) => {
-    const { toEmail, subject, message, attachments } = req.body;
+    const { toEmail, subject, message, attachments, html } = req.body;
     const newarr = [];
     if (attachments !== undefined) {
       for (let i = 0; i < attachments.length; i++) {
@@ -47,10 +59,13 @@ server.post(
         newarr[i] = temparr;
       }
     }
-    await sendEmail({ toEmail, subject, message, attachments: newarr });
-    res.status(200).json({
-      success: true,
-      message: `email successfully sent to ${toEmail}. if email does not appear in inbox, please check spam list`,
+    await sendEmail({
+      toEmail,
+      subject,
+      message,
+      attachments: newarr,
+      html,
+      res,
     });
   })
 );
